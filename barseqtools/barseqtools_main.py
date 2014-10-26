@@ -18,6 +18,8 @@ def run_subtool(parser, args):
         import count_yeast_barcodes as submodule
     if args.command == 'count_subseq':
         import count_universal_primer_bits as submodule
+    if args.command == 'pilot':
+        import pilot as submodule
     elif args.command == 'kmer':
         import kmer as submodule
     elif args.command == 'kmerplot':
@@ -136,6 +138,55 @@ def main():
     parser_count_subseq.set_defaults(func=run_subtool)
 
 
+
+
+    ##########
+    # pilot analysis - to be run on the 20k reads I sampled
+    ##########
+    parser_pilot = subparsers.add_parser('pilot',
+                                        help='NEW FEATURE -- NOT YET STABLE/FINISHED. Count unique sample indexes in first 5 bp of reads.')
+    parser_pilot_filetype = parser_pilot.add_mutually_exclusive_group()
+    parser_pilot_filetype.add_argument('-fa', '--fasta',
+                              dest='fasta',
+                              default=None,
+                              type=str,
+                              help=('''Specify "--fasta file.fa" for analyzing a fasta file.'''))
+    parser_pilot_filetype.add_argument('--fastq',
+                              dest='fastq',
+                              default=None,
+                              type=str,
+                              help=('''Specify "--fasta file.fq" for analyzing a fastq file.'''))
+    parser_pilot.add_argument('--outprefix',
+                              type=str,
+                              required=True,
+                              help="Provide an output prefix that will be appended to the beginning of output files.")
+    parser_pilot.add_argument('--indexes',
+                             dest='indexes',
+                             type=str,
+                             help='''Path to tab-delim file with: sample_name, index, ...any....''',
+                             default=None, required=True)
+    parser_pilot.add_argument('--barcodes',
+                             dest='barcodes',
+                             type=str,
+                             help='''Path to tab-delim file with: ORF_name, 20mer-barcode, ...any....''',
+                             default=None, required=True)
+## TO ADD IN -- get info on proportion that had perfect match primer bits
+##    parser_pilot.add_argument('--sequence',
+##                             dest='sequence',
+##                             type=str,
+##                             help='''Path to tab-delim file with: ORF_name, 20mer-barcode, ...any....''',
+##                             default="GTCCACGAGGTCTCT")
+##    parser_pilot.add_argument('--start',
+##                             dest='start',
+##                             type=int,
+##                             help='''Start position (python coordinates are 0-based) in read - for a 50 bp read, this can be 0-49.''',
+##                             default=5)
+##    parser_pilot.add_argument('--min-read-length',
+##                             dest='min_read_length',
+##                             type=int,
+##                             help='''Min read length expected. Takes an integer. Default 50 bp. ''',
+##                             default=50)
+    parser_pilot.set_defaults(func=run_subtool)
 
 
     ##########
