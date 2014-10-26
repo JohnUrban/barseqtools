@@ -1,0 +1,14 @@
+1. There are 5 proteins being looked at in 2 conditions.
+	Proteins:
+		1. L1
+		2. L25
+		3. S2
+		4. S15
+		5. Bet1
+	Conditions:
+		1. Galactose (before depletion)
+		2. Glucose (after depletion)
+	Total:
+		5 proteins x 2 conditions = 10 sample types
+2. There are 3 replicates of each sample type: 3 reps x 10 sample types = 30 total samples
+

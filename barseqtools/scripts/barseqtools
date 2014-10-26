@@ -1,0 +1,5 @@
+#!/usr/bin/python -E
+
+import barseqtools.scripts
+import barseqtools.barseqtools_main
+barseqtools.barseqtools_main.main()
