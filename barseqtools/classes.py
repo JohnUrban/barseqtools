@@ -43,6 +43,10 @@ class BarSeq(object):
         self.sample2index = None
         self.barcode2gene = None
         self.gene2barcode = None
+        self.protein_set = set()
+        self.conditon_set = set()
+        self.rep_num_set = set()
+        self.genes = set()
         self.index_barcode_counts = None
         self.sample_gene_counts = None
         
@@ -57,9 +61,18 @@ class BarSeq(object):
                 gene_name barcode'''
         self.barcode2gene, self.gene2barcode = make_barcode_to_gene_dict(self.barcodes_fh)
 
+    def make_sets(self):
+        if not index2sample:
+            self.make_index_to_sample_dict()
+        if not barcode2gene:
+            self.make_barcode_to_gene_dict()
+        # make sets of protein, conditions, rep nums, genes
+        pass
+
     def make_index_barcode_counts_dict(self):
         ''' makes a dict d s.t. s[sample][barcode] gives count'''
         self.index_barcode_counts = index_barcode_counter(self.fastx_fh, self.fastx)
+
 
     def write_index_barcode_counts_table(self, out_fh=None):
         if not self.index_barcode_counts:
@@ -95,6 +108,23 @@ class BarSeq(object):
         if not out_fh:
             out_fh = self.output_prefix + "-sample_gene_counts_2.tsv"
         write_sample_gene_counts_table_2(self.sample_barcode_counts, self.sample2index, self.barcode2gene, out_fh)
+
+
+    def pilot_diff_abundance():
+        pass
+
+    def unanticipated_index_analysis():
+        ## hamming dist or something
+        pass
+
+    def unanticipated_barcode_analysis():
+        pass
+
+    def update_counts():
+        ## This will optionally allow a distance of 1-2 for unanticipated sample indexes and for unanticipated barcodes
+        ## It will identify which anticipated barcode (if any) an unanticipated barcode can be assigned to,
+        ##  then adds the associated count to the anticipated barcode
+        pass
 
     def analyze(self):
         ''' Assumes index file has following 4-5 columns:

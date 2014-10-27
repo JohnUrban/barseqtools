@@ -20,6 +20,8 @@ def run_subtool(parser, args):
         import count_universal_primer_bits as submodule
     if args.command == 'pilot':
         import pilot as submodule
+    if args.command == 'fitting_aln':
+        import fitting_aln as submodule
     elif args.command == 'kmer':
         import kmer as submodule
     elif args.command == 'kmerplot':
@@ -187,6 +189,47 @@ def main():
 ##                             help='''Min read length expected. Takes an integer. Default 50 bp. ''',
 ##                             default=50)
     parser_pilot.set_defaults(func=run_subtool)
+
+
+
+
+
+    ##########
+    # fitting alignment
+    ##########
+    parser_fitting_aln = subparsers.add_parser('fitting_aln',
+                                        help='NEW FEATURE -- NOT YET STABLE/FINISHED. Performs fitting alignment of some string over all reads -- returns stats')
+    parser_fitting_aln_filetype = parser_fitting_aln.add_mutually_exclusive_group(required=True)
+    parser_fitting_aln_filetype.add_argument('-fa', '--fasta',
+                              dest='fasta',
+                              default=None,
+                              type=str,
+                              help=('''Specify "--fasta file.fa" for analyzing a fasta file.'''))
+    parser_fitting_aln_filetype.add_argument('--fastq',
+                              dest='fastq',
+                              default=None,
+                              type=str,
+                              help=('''Specify "--fasta file.fq" for analyzing a fastq file.'''))
+    parser_fitting_aln.add_argument('--sequence',
+                             dest='sequence',
+                             type=str,
+                             help='''Provide a sequence < min read length. Default is the KanRR fragment: CGTACGCTGCAGGTCG''',
+                             default='CGTACGCTGCAGGTCG') ##shortest version of KanR fragment that maximized scores on some pilot reads
+    parser_fitting_aln.add_argument('-w', '--with-read-names',
+                             dest='with_read_names', action="store_true",
+                             default=False,
+                             help='''If set, will print "readname, startPosInRead, fitAlnScore, fitAlnScore/queryLen";
+                                else just "startPosInRead,fitAlnScore, fitAlnScore/queryLen".
+                                Start position is in pythonese (0-based).''')
+    parser_fitting_aln.add_argument('-r', '--random-sequence',
+                             dest='random_sequence', type=int,
+                             default=False,
+                             help='''Provide integer for random sequence length. This option overrides --sequence.''')
+    parser_fitting_aln.set_defaults(func=run_subtool)
+
+
+
+
 
 
     ##########
