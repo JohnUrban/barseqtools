@@ -88,6 +88,22 @@ def hammingDistMult(kmer1, kmerList):
     return sumHamm
 
 
+def minHammingDist(subjectkmer, kmerlist):
+    '''
+    Takes in a kmer and a list of kmers (where lengths can vary).
+    Returns kmer(s) in list that minimizes hamming distance and the hamming dist.
+    '''
+    minHamm = float("inf")
+    for querykmer in kmerlist:
+        hamm = hammingDist(subjectkmer, querykmer)
+        if hamm < minHamm:
+            minKmers = [querykmer]
+            minHamm = hamm
+        elif hamm == minHamm:
+            minKmers.append(querykmer)
+    return minKmers, minHamm
+
+
 def alignToMinHammDist(read, sequence):
     ''' Takes in 2 DNA strings: a read and a sequence where |read| <= |sequence|
     Returns the start position(s) that minimize(s) the hamming distance (i.e. minimizes mismatches)
@@ -105,6 +121,7 @@ def alignToMinHammDist(read, sequence):
         elif hamdist == minHam:
             startPositions += [i]
     return startPositions, minHam
+
 
 
 
@@ -513,7 +530,8 @@ def generalizedFittingAln(seq1, seq2):  ## derived from gen Loc
     LP = longestPathObject(longestPathTo, seq1, seq2)
     BT = backtrackObject(backtrack, seq1, seq2)
     CS, alnSeq1, alnSeq2, i, j = generalizedOutputLocalAln(backtrack, seq1, seq2, i, j)
-    return int(maxScore(maxNode)), i, j, alnSeq1, alnSeq2, LP, BT
+    startPosInLongerSeq = i ## j not useful, should be 0
+    return int(maxScore(maxNode)), startPosInLongerSeq, alnSeq1, alnSeq2, LP, BT
     ## Note: seq1>seq2 and i is where alignment starts in seq1 (j should be 0)
     ## Trying to align ALL of seq2 to substring of seq1
     ## i.e. all of a 20 bp barcode to a 100 bp read

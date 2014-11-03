@@ -61,14 +61,21 @@ def main():
     # sample index counting
     ##########
     parser_count_samples = subparsers.add_parser('count_samples',
-                                        help='NEW FEATURE -- NOT YET STABLE/FINISHED. Count unique sample indexes in first 5 bp of reads.')
+                                        help='''Count unique sample indexes in first 5 bp of reads. Appropriate for early pilot analyses on a subsample of all reads.
+                                                Right now, exact matches are used to count samples.
+                                                In future, it will also analyze non-exact matches for lowest hamming distance index < some cutoff.
+                                                Will give exact match information on the following:
+                                                number unique 5mers found, total number 5mers counted (should be equal to the
+                                                number of reads analyzed), number of indexes anticipated (should be equal to the number of indexes
+                                                in index file provided), number/percent of anticipated indexes found,
+                                                number/percent of 5mers encountered that make up anticipated indexes, counts seen per sample.''')
     parser_count_samples_filetype = parser_count_samples.add_mutually_exclusive_group()
     parser_count_samples_filetype.add_argument('-fa', '--fasta',
                               dest='fasta',
                               default=None,
                               type=str,
                               help=('''Specify "--fasta file.fa" for analyzing a fasta file.'''))
-    parser_count_samples_filetype.add_argument('--fastq',
+    parser_count_samples_filetype.add_argument('-fq', '--fastq',
                               dest='fastq',
                               default=None,
                               type=str,
@@ -92,7 +99,7 @@ def main():
                               default=None,
                               type=str,
                               help=('''Specify "--fasta file.fa" for analyzing a fasta file.'''))
-    parser_count_barcodes_filetype.add_argument('--fastq',
+    parser_count_barcodes_filetype.add_argument('-fq', '--fastq',
                               dest='fastq',
                               default=None,
                               type=str,
@@ -107,7 +114,7 @@ def main():
 
 
     ##########
-    # universal primer counting -- positions 5-19 are shared by all
+    # subsequence_counting ---> originally used for universal primer counting (positions 5-19) shared by all reads
     ##########
     parser_count_subseq = subparsers.add_parser('count_subseq',
                                         help='NEW FEATURE -- NOT YET STABLE/FINISHED. Default: Count shared 15mers in positions 5-20 of reads (in pyhton-ese coordinates). Alt: specify any sequence and starting position such that the sequence is not longer than the read when starting at that position.')
@@ -117,7 +124,7 @@ def main():
                               default=None,
                               type=str,
                               help=('''Specify "--fasta file.fa" for analyzing a fasta file.'''))
-    parser_count_subseq_filetype.add_argument('--fastq',
+    parser_count_subseq_filetype.add_argument('-fq', '--fastq',
                               dest='fastq',
                               default=None,
                               type=str,
@@ -125,12 +132,15 @@ def main():
     parser_count_subseq.add_argument('--sequence',
                              dest='sequence',
                              type=str,
-                             help='''Path to tab-delim file with: ORF_name, 20mer-barcode, ...any....''',
+                             help='''Sequence to match specified portion of reads against. Default: GTCCACGAGGTCTCT.
+                                    The default is the universal 15 base sequence after the first 5 index bases in the bar-seq primers
+                                    and should be shared by all reads. The start position in pythonese is 5, which is the default for --start''',
                              default="GTCCACGAGGTCTCT")
     parser_count_subseq.add_argument('--start',
                              dest='start',
                              type=int,
-                             help='''Start position (python coordinates are 0-based) in read - for a 50 bp read, this can be 0-49.''',
+                             help='''Start position (python coordinates are 0-based) in read - for a 50 bp read, this can be 0-49.
+                                    Default = 5 for the default analysis of matching the universal 15 bp in bar-seq primers shared by all reads.''',
                              default=5)
     parser_count_subseq.add_argument('--min-read-length',
                              dest='min_read_length',
@@ -153,7 +163,7 @@ def main():
                               default=None,
                               type=str,
                               help=('''Specify "--fasta file.fa" for analyzing a fasta file.'''))
-    parser_pilot_filetype.add_argument('--fastq',
+    parser_pilot_filetype.add_argument('-fq', '--fastq',
                               dest='fastq',
                               default=None,
                               type=str,
@@ -205,7 +215,7 @@ def main():
                               default=None,
                               type=str,
                               help=('''Specify "--fasta file.fa" for analyzing a fasta file.'''))
-    parser_fitting_aln_filetype.add_argument('--fastq',
+    parser_fitting_aln_filetype.add_argument('-fq', '--fastq',
                               dest='fastq',
                               default=None,
                               type=str,
@@ -215,17 +225,37 @@ def main():
                              type=str,
                              help='''Provide a sequence < min read length. Default is the KanRR fragment: CGTACGCTGCAGGTCG''',
                              default='CGTACGCTGCAGGTCG') ##shortest version of KanR fragment that maximized scores on some pilot reads
+    parser_fitting_aln.add_argument('-m', '--multiple-sequences',
+                             dest='multiple_sequences',
+                             type=str, default=None,
+                             help='''Provide a path to a file with 1 sequence per line.
+                                    For each read in the fastx file, it will report the fitting alignment for the
+                                    sequence in this file with the best fitting aln.
+                                    Each time it encounters a score that ties the current max score, it exchanges the older fiting aln
+                                    info for the new fitting aln info with a 50%% probability.
+                                    This way there is a random assignment of the best barcode.
+                                    Use --all-scores instead to get an output with all max scores and barcodes returned.''')
     parser_fitting_aln.add_argument('-w', '--with-read-names',
                              dest='with_read_names', action="store_true",
                              default=False,
                              help='''If set, will print "readname, startPosInRead, fitAlnScore, fitAlnScore/queryLen";
                                 else just "startPosInRead,fitAlnScore, fitAlnScore/queryLen".
                                 Start position is in pythonese (0-based).''')
+    parser_fitting_aln.add_argument('-e', '--with-edit-distances',
+                             dest='with_edit_distances', action="store_true",
+                             default=False,
+                             help='''If set, edit dist will be incl in output''')
+    parser_fitting_aln.add_argument('-a', '--with-aln-seqs',
+                             dest='with_aln_seqs', action="store_true",
+                             default=False,
+                             help='''If set, the aligned versions of sequences 1 (read) and 2 (provided) will be printed.''')
     parser_fitting_aln.add_argument('-r', '--random-sequence',
                              dest='random_sequence', type=int,
                              default=False,
                              help='''Provide integer for random sequence length. This option overrides --sequence.''')
     parser_fitting_aln.set_defaults(func=run_subtool)
+## I ran some tests and doing the fitting aln is more sensitive for barcodes that match 100% but start at 18 or 19 instead of 20
+    ## saw one perfect aln at pos 55...
 
 
 

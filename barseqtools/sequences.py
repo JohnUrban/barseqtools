@@ -82,3 +82,7 @@ def triple_checker(filename, fastx, s1, l1, s2, l2, qcStart, qcSeq):
             counts[sequence[s1:end1]][sequence[s2:end2]] = 1
     return counts
     
+
+
+
+

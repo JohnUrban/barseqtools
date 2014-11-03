@@ -1,5 +1,9 @@
 #
 from sequences import *
+from collections import defaultdict
+from useful_functions import *
+
+
 
 def run(parser, args):
     filename, fastx = filetype(args)
@@ -18,8 +22,15 @@ def run(parser, args):
         print "Number %d-mers encountered: %d" % (length, sum(counts.values()))
         represented = counts[args.sequence]
         print "Number of anticipated sequences found at given start position: %d" % represented
-        total = sum(counts.values())
+        total = float(sum(counts.values()))
         percent = 100*float(represented)/total
         print "Percent of %d-mers that make up anticipated sequence: %d" % (length, percent)
+        print "Hamming distance information:"
+        hd = defaultdict(int)
+        for kmer in counts.keys():
+            hd[hammingDist(kmer, args.sequence)] += counts[kmer]
+        print ("\t").join(["HammingDist", "%d-merCount", "%d-merPercent"]) % (length, length)
+        for ham, count in sorted(hd.iteritems()):
+            print ("\t").join(["%d", "%d", "%f"]) % (ham, count, 100*float(count)/total)
 
         
