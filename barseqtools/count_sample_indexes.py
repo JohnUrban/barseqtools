@@ -69,7 +69,7 @@ def run(parser, args):
                         hd1 += counts[kmer]
                     elif kmerhd[kmer][1] == 2:
                         hd2 += counts[kmer]                             
-            print ('\t').join(["%s", "%d", "%d", "%d", "%d"]) % (sample, hd0, hd0, hd0+hd1, hd0+hd1+hd2)
+            print ('\t').join(["%s", "%d", "%d", "%d"]) % (sample, hd0, hd0+hd1, hd0+hd1+hd2)
             totalWhenhd2 += hd0+hd1+hd2
 ##        print 100*totalWhenhd2/total - cumUniTotal
         

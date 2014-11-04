@@ -4,6 +4,21 @@ from collections import defaultdict
 import numpy
 import random
 
+
+def complement(DNAstring):
+    DNAstring = DNAstring.upper()
+    compString = ''
+    complement = {'A':'T', 'C':'G', 'G':'C', 'T':'A', 'N':'N'}
+    for base in DNAstring:
+        compString = compString + complement[base]
+    return compString
+
+def reverseComplement(DNAstring):
+    return complement(DNAstring[-1::-1])
+
+def reverse_seq(DNAstring):
+    return DNAstring[-1::-1]
+
 def random_seq(seqLen):
     '''Depends on random module'''
     bases = 'ACGT'

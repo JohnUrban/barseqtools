@@ -109,6 +109,13 @@ def main():
                              type=str,
                              help='''Path to tab-delim file with: ORF_name, 20mer-barcode, ...any....''',
                              default=None, required=True)
+    parser_count_barcodes.add_argument('-hd', '--hamming',
+                             dest='hamming_analysis',
+                             action="store_true",
+                             help='''Instead of looking at exact match stats (which is hamming distance of 0), perform
+                                    a more thorough hamming distance analysis looking at unique assignments if up to 1 or 2 mismatches
+                                    is allowed (and unique barcode that minimizes hamDist is selected if one exists).''',
+                             default=False)
     parser_count_barcodes.set_defaults(func=run_subtool)
 
 
@@ -253,6 +260,17 @@ def main():
                              dest='random_sequence', type=int,
                              default=False,
                              help='''Provide integer for random sequence length. This option overrides --sequence.''')
+    parser_fitting_aln_seqtransform = parser_fitting_aln.add_mutually_exclusive_group()
+    parser_fitting_aln_seqtransform.add_argument("-c", "--complement", action="store_true", default=False,
+                                                 help=''' Use complement of provided sequence -- right now only works on single seq.
+                                                            e.g. AACC -> TTGG''')
+    parser_fitting_aln_seqtransform.add_argument("-rc", "--reverse_complement", action="store_true", default=False,
+                                                 help=''' Use reverse complement of provided sequence -- right now only works on single seq.
+                                                            e.g. AACC -> GGTT''')
+    parser_fitting_aln_seqtransform.add_argument("-rs", "--reverse_sequence", action="store_true", default=False,
+                                                 help=''' Use reverse sequence of provided sequence -- right now only works on single seq.
+                                                            e.g. AACC -> CCAA''')
+
     parser_fitting_aln.set_defaults(func=run_subtool)
 ## I ran some tests and doing the fitting aln is more sensitive for barcodes that match 100% but start at 18 or 19 instead of 20
     ## saw one perfect aln at pos 55...

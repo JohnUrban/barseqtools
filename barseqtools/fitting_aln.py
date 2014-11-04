@@ -70,6 +70,13 @@ def run(parser, args):
     filename, fastx = filetype(args)
     if args.random_sequence:
         args.sequence = random_seq(args.random_sequence)
+    ## seq trans?
+    if args.reverse_complement:
+        args.sequence = reverseComplement(args.sequence)
+    elif args.complement:
+        args.sequence = complement(args.sequence)
+    elif args.reverse_sequence:
+        args.sequence = reverse_seq(args.sequence)
     if not args.multiple_sequences:
         fit = FitAln(fastx, filename, args.sequence,None, args.with_read_names, args.with_edit_distances, args.with_aln_seqs)
         fit.print_fitting_aln_stats_over_all_reads()
